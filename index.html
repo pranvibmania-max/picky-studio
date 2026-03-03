@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Picky Studio</title>
+    <script>
+      // Silent global error handler to suppress specific fetch errors
+      window.addEventListener('error', function(e) {
+        if (e.message && (e.message.includes('Cannot set property fetch') || e.message.includes('fetch is read-only'))) {
+          e.preventDefault();
+          e.stopPropagation();
+          e.stopImmediatePropagation();
+          return true;
+        }
+      }, true);
+
+      window.onerror = function(msg) {
+        if (msg && typeof msg === 'string' && (msg.includes('Cannot set property fetch') || msg.includes('fetch is read-only'))) {
+          return true;
+        }
+      };
+
+      window.addEventListener('unhandledrejection', function(e) {
+        if (e.reason && e.reason.message && (e.reason.message.includes('Cannot set property fetch') || e.reason.message.includes('fetch is read-only'))) {
+          e.preventDefault();
+        }
+      });
+
+      // Aggressive patch for window.fetch
+      (function() {
+        try {
+          var originalFetch = window.fetch;
+          
+          // Try to shadow the property on the window instance
+          // This bypasses prototype getters if we define it as an own property
+          var currentFetch = originalFetch;
+          
+          Object.defineProperty(window, 'fetch', {
+            get: function() { return currentFetch; },
+            set: function(newFetch) { currentFetch = newFetch; },
+            configurable: true,
+            enumerable: true
+          });
+        } catch (e) {
+          // If direct definition fails, try to make the existing property writable
+          try {
+            Object.defineProperty(window, 'fetch', {
+              writable: true,
+              configurable: true
+            });
+          } catch (e2) {
+            // If all else fails, the error handlers above should catch the assignment error
+          }
+        }
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
+

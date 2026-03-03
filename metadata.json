@@ -1,0 +1,7 @@
+{
+  "name": "Picky Studio",
+  "description": "Generate high-quality images using Google's Gemini AI models.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
