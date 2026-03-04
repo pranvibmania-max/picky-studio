@@ -16,12 +16,31 @@ export const generateImagePollinations = async (
   
   const url = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=${width}&height=${height}&seed=${seed}&model=${model}&nologo=true`;
   
-  // We can just return the URL directly as Pollinations generates on the fly
-  // However, to ensure it works and to catch errors, we might want to fetch it first.
-  // But for speed, returning the URL is standard for Pollinations.
-  // To be safe and consistent with other services that return a base64 or a verified URL,
-  // we could fetch it. But Pollinations is a GET request that returns the image.
-  // The Image component can handle the URL.
-  
-  return url;
+  // We will fetch the image so we can return a `data:` URI.  This avoids
+  // potential cross‑origin problems when using the URL directly and keeps the
+  // return value consistent with Gemini/OpenAI helpers (which return base64 data).
+  try {
+    const resp = await fetch(url);
+    if (!resp.ok) {
+      throw new Error(`Pollinations request failed: ${resp.status}`);
+    }
+    const blob = await resp.blob();
+    // Convert blob to base64 string
+    const reader = new FileReader();
+    const dataUrl: Promise<string> = new Promise((resolve, reject) => {
+      reader.onloadend = () => {
+        if (typeof reader.result === 'string') {
+          resolve(reader.result);
+        } else {
+          reject(new Error('Failed to convert blob to base64'));
+        }
+      };
+      reader.onerror = reject;
+    });
+    reader.readAsDataURL(blob);
+    return await dataUrl;
+  } catch (err) {
+    console.warn('Pollinations fetch failed, returning direct URL', err);
+    return url;
+  }
 };
