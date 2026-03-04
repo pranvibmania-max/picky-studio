@@ -1728,7 +1728,7 @@ export default function ImageGenerator() {
                     </div>
                     <div className="space-y-1.5">
                       <label className="text-xs text-zinc-500 font-medium">Seed (Optional)</label>
-                      <div className="flex gap-2">
+                      <div className="flex gap-2 items-center">
                         <input
                           type="number"
                           value={seed}
@@ -1745,6 +1745,22 @@ export default function ImageGenerator() {
                           <Dices className="w-4 h-4" />
                         </button>
                       </div>
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className="text-xs text-zinc-500 font-medium">NSFW Mode</label>
+                      <button
+                        type="button"
+                        onClick={() => setNsfwMode(!nsfwMode)}
+                        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-offset-2 focus:ring-offset-zinc-900 ${
+                          nsfwMode ? 'bg-pink-600' : 'bg-zinc-700'
+                        }`}
+                      >
+                        <span
+                          className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                            nsfwMode ? 'translate-x-6' : 'translate-x-1'
+                          }`}
+                        />
+                      </button>
                     </div>
                   </div>
                 )}
