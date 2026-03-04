@@ -183,6 +183,8 @@ function Dropdown({ label, value, options, onChange, icon, placeholder }: Dropdo
 
 export default function ImageGenerator() {
   const [prompt, setPrompt] = useState('A 23 year old beautiful girl, portrait, cinematic lighting, high detail');
+  const [seed, setSeed] = useState('');
+  const [theme, setTheme] = useState<'light'|'dark'>(() => localStorage.getItem('theme') === 'light' ? 'light' : 'dark');
   const [aspectRatio, setAspectRatio] = useState(() => localStorage.getItem('aspectRatio') || '1:1');
   const [numImages, setNumImages] = useState<1 | 4>(() => {
     const saved = localStorage.getItem('numImages');
@@ -198,6 +200,9 @@ export default function ImageGenerator() {
   const [spicyMode, setSpicyMode] = useState(() => {
     return localStorage.getItem('spicyMode') === 'true';
   });
+  const [nsfwMode, setNsfwMode] = useState(() => {
+    return localStorage.getItem('nsfwMode') === 'true';
+  });
   const [pollinationsWidth, setPollinationsWidth] = useState(() => {
     return parseInt(localStorage.getItem('pollinationsWidth') || '1024');
   });
@@ -210,6 +215,10 @@ export default function ImageGenerator() {
   }, [spicyMode]);
 
   useEffect(() => {
+    localStorage.setItem('nsfwMode', String(nsfwMode));
+  }, [nsfwMode]);
+
+  useEffect(() => {
     localStorage.setItem('pollinationsWidth', pollinationsWidth.toString());
   }, [pollinationsWidth]);
 
@@ -219,6 +228,11 @@ export default function ImageGenerator() {
   const [mockMode, setMockMode] = useState(() => {
     return localStorage.getItem('mockMode') === 'true';
   });
+
+  useEffect(() => {
+    document.documentElement.classList.toggle('light', theme === 'light');
+    localStorage.setItem('theme', theme);
+  }, [theme]);
   const [showMockPrompt, setShowMockPrompt] = useState(false);
   const [image, setImage] = useState<string | null>(null);
 
@@ -281,7 +295,10 @@ export default function ImageGenerator() {
 
   const [variations, setVariations] = useState<string[]>([]);
   const [history, setHistory] = useState<Array<{ id: string; prompt: string; image: string; aspectRatio: string; timestamp: number }>>([]);
-  const [baseImage, setBaseImage] = useState<string | null>(null);
+  const clearHistory = () => {
+    setHistory([]);
+    localStorage.removeItem('history');
+  };  const [baseImage, setBaseImage] = useState<string | null>(null);
   const [isCameraOpen, setIsCameraOpen] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
   const [loading, setLoading] = useState(false);
@@ -1296,6 +1313,7 @@ export default function ImageGenerator() {
             </div>
             <div className="relative group">
             <div className="absolute -inset-0.5 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-xl opacity-20 group-hover:opacity-40 transition duration-500 blur"></div>
+            <div className="relative">
             <textarea
               value={prompt}
               onChange={(e) => setPrompt(e.target.value)}
@@ -1303,6 +1321,17 @@ export default function ImageGenerator() {
               className="relative w-full min-h-[120px] p-4 rounded-xl bg-zinc-950 border border-zinc-800 focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/50 resize-none text-white placeholder-zinc-600 transition-all text-base leading-relaxed"
               disabled={loading}
             />
+            <button
+              type="button"
+              onClick={() => {
+                navigator.clipboard.writeText(prompt);
+              }}
+              className="absolute top-3 right-3 p-1 text-zinc-400 hover:text-zinc-200"
+              title="Copy prompt"
+            >
+              <CopyIcon className="w-4 h-4" />
+            </button>
+          </div>
             <div className="absolute bottom-3 right-3 flex items-center gap-2 z-10">
               <button
                 type="button"
@@ -1524,6 +1553,35 @@ export default function ImageGenerator() {
                         spicyMode ? 'bg-red-600' : 'bg-zinc-700'
                       }`}
                     >
+                  </div>
+                </>
+              )}
+
+              {/* NSFW toggle visible for all providers */}
+              <div className="flex items-center justify-between p-4 bg-zinc-900 rounded-lg border border-pink-900/30 shadow-[0_0_15px_-5px_rgba(219,39,119,0.1)]">
+                <div className="space-y-0.5">
+                  <label className="text-sm font-medium text-zinc-200 flex items-center gap-2">
+                    <EyeOff className="w-4 h-4 text-pink-500" />
+                    NSFW / Uncensored
+                  </label>
+                  <p className="text-xs text-zinc-500">
+                    Allow explicit or adult content. Toggle at your own risk.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setNsfwMode(!nsfwMode)}
+                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-offset-2 focus:ring-offset-zinc-900 ${
+                    nsfwMode ? 'bg-pink-600' : 'bg-zinc-700'
+                  }`}
+                >
+                  <span
+                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                      nsfwMode ? 'translate-x-6' : 'translate-x-1'
+                    }`}
+                  />
+                </button>
+              </div>
                       <span
                         className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
                           spicyMode ? 'translate-x-6' : 'translate-x-1'
@@ -1989,10 +2047,11 @@ export default function ImageGenerator() {
               </button>
             </div>
 
+            <div className="flex flex-col sm:flex-row sm:items-center gap-2">
             <button
               type="submit"
             disabled={loading || !prompt.trim()}
-            className="w-full py-4 px-6 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold text-lg transition-all flex items-center justify-center gap-2 shadow-lg shadow-indigo-500/20 cursor-pointer border border-white/10"
+            className="flex-1 py-4 px-6 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold text-lg transition-all flex items-center justify-center gap-2 shadow-lg shadow-indigo-500/20 cursor-pointer border border-white/10"
           >
             {loading ? (
               <>
@@ -2007,7 +2066,14 @@ export default function ImageGenerator() {
             )}
           </button>
         </form>
-
+                <button
+                  type="button"
+                  onClick={() => navigator.clipboard.writeText(prompt)}
+                  disabled={!prompt.trim()}
+                  className="mt-2 w-full sm:w-auto self-center py-2 px-4 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-sm transition"
+                >
+                  Copy Prompt
+                </button>
         {error && (
           <div className="p-4 rounded-lg bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 text-sm flex flex-col gap-2">
             <p>{error}</p>
@@ -2303,6 +2369,13 @@ export default function ImageGenerator() {
             </button>
 
             <button
+              onClick={() => navigator.clipboard.writeText(image || '')}
+              className="group relative flex items-center gap-2 px-6 py-2.5 rounded-xl bg-zinc-900 border border-zinc-800 text-zinc-300 hover:text-white transition-all font-medium shadow-lg hover:shadow-gray-500/10 hover:border-gray-500/30 overflow-hidden"
+            >
+              <ImageIcon className="w-4 h-4 group-hover:scale-110 transition-transform text-gray-400" />
+              <span className="relative">Copy Image URL</span>
+            </button>
+            <button
               onClick={handleShare}
               className="group relative flex items-center gap-2 px-6 py-2.5 rounded-xl bg-zinc-900 border border-zinc-800 text-zinc-300 hover:text-white transition-all font-medium shadow-lg hover:shadow-blue-500/10 hover:border-blue-500/30 overflow-hidden"
             >
@@ -2311,6 +2384,22 @@ export default function ImageGenerator() {
               <span className="relative">Share</span>
             </button>
 
+            {variations.length > 1 && (
+              <button
+                onClick={() => {
+                  variations.forEach((img, idx) => {
+                    const a = document.createElement('a');
+                    a.href = img;
+                    a.download = `variation-${idx+1}.png`;
+                    a.click();
+                  });
+                }}
+                className="group relative flex items-center gap-2 px-6 py-2.5 rounded-xl bg-zinc-900 border border-zinc-800 text-zinc-300 hover:text-white transition-all font-medium shadow-lg hover:shadow-emerald-500/10 hover:border-emerald-500/30 overflow-hidden"
+              >
+                <Download className="w-4 h-4 group-hover:scale-110 transition-transform text-emerald-400" />
+                <span className="relative">Download All</span>
+              </button>
+            )}
             <button
               onClick={() => openCollectionModal(image, prompt)}
               className="group relative flex items-center gap-2 px-6 py-2.5 rounded-xl bg-zinc-900 border border-zinc-800 text-zinc-300 hover:text-white transition-all font-medium shadow-lg hover:shadow-amber-500/10 hover:border-amber-500/30 overflow-hidden"
