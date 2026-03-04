@@ -2104,7 +2104,7 @@ export default function ImageGenerator() {
                             src={comparisonImage || image}
                             alt="Original"
                             className="max-w-full max-h-[500px] object-contain shadow-xl border border-zinc-800 rounded-lg"
-                            crossOrigin="anonymous"
+                            {...(provider === 'pollinations' ? {} : { crossOrigin: 'anonymous' })}
                           />
                         </div>
                         <div className="w-px h-full bg-zinc-800 mx-2" />
@@ -2119,7 +2119,7 @@ export default function ImageGenerator() {
                             style={{ 
                               filter: `brightness(${brightness}%) contrast(${contrast}%) saturate(${saturation}%) sepia(${sepia}%) grayscale(${grayscale}%) invert(${invert}%)`
                             }}
-                            crossOrigin="anonymous"
+                            {...(provider === 'pollinations' ? {} : { crossOrigin: 'anonymous' })}
                           />
                         </div>
                       </div>
@@ -2130,11 +2130,7 @@ export default function ImageGenerator() {
                           src={comparisonImage || image}
                           alt="Original"
                           className="max-w-full max-h-[600px] object-contain shadow-2xl"
-                          crossOrigin="anonymous"
-                        />
-                        
-                        {/* Adjusted Image (Foreground, Clipped) */}
-                        <div 
+                            {...(provider === 'pollinations' ? {} : { crossOrigin: 'anonymous' })}
                           className="absolute inset-0 overflow-hidden flex items-center justify-center"
                           style={{ clipPath: `inset(0 ${100 - sliderPosition}% 0 0)` }}
                         >
@@ -2145,7 +2141,7 @@ export default function ImageGenerator() {
                             style={{ 
                               filter: `brightness(${brightness}%) contrast(${contrast}%) saturate(${saturation}%) sepia(${sepia}%) grayscale(${grayscale}%) invert(${invert}%)`,
                             }}
-                            crossOrigin="anonymous"
+                            {...(provider === 'pollinations' ? {} : { crossOrigin: 'anonymous' })}
                           />
                         </div>
 
@@ -2165,7 +2161,7 @@ export default function ImageGenerator() {
                         alt="Generated content"
                         className="max-w-full max-h-[600px] object-contain shadow-2xl transition-all duration-200"
                         style={{ filter: showOriginal ? 'none' : `brightness(${brightness}%) contrast(${contrast}%) saturate(${saturation}%) sepia(${sepia}%) grayscale(${grayscale}%) invert(${invert}%)` }}
-                        crossOrigin="anonymous"
+                        {...(provider === 'pollinations' ? {} : { crossOrigin: 'anonymous' })}
                       />
                     )}
                   </div>

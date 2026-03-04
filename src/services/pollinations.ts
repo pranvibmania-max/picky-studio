@@ -16,31 +16,17 @@ export const generateImagePollinations = async (
   
   const url = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=${width}&height=${height}&seed=${seed}&model=${model}&nologo=true`;
   
-  // We will fetch the image so we can return a `data:` URI.  This avoids
-  // potential cross‑origin problems when using the URL directly and keeps the
-  // return value consistent with Gemini/OpenAI helpers (which return base64 data).
-  try {
-    const resp = await fetch(url);
-    if (!resp.ok) {
-      throw new Error(`Pollinations request failed: ${resp.status}`);
-    }
-    const blob = await resp.blob();
-    // Convert blob to base64 string
-    const reader = new FileReader();
-    const dataUrl: Promise<string> = new Promise((resolve, reject) => {
-      reader.onloadend = () => {
-        if (typeof reader.result === 'string') {
-          resolve(reader.result);
-        } else {
-          reject(new Error('Failed to convert blob to base64'));
-        }
-      };
-      reader.onerror = reject;
-    });
-    reader.readAsDataURL(blob);
-    return await dataUrl;
-  } catch (err) {
-    console.warn('Pollinations fetch failed, returning direct URL', err);
-    return url;
-  }
+  // Pollinations simply serves the image at a predictable URL.  Returning
+  // that URL lets the <img> element load it directly, which is usually fine
+  // and avoids CORS problems that can occur when trying to `fetch` the blob
+  // in the browser.
+  //
+  // Clamp dimensions to a reasonable maximum (the service seems happy up to
+  // 1024x1024; larger values may return errors).  Also ensure they stay
+  // divisible by 64 since the UI restricts them to that step.
+  const maxSize = 1024;
+  const w = Math.min(width, maxSize);
+  const h = Math.min(height, maxSize);
+  const finalUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=${w}&height=${h}&seed=${seed}&model=${model}&nologo=true`;
+  return finalUrl;
 };
