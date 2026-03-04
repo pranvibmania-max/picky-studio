@@ -1726,41 +1726,43 @@ export default function ImageGenerator() {
                         className="w-full px-3 py-2 bg-zinc-900 border border-zinc-800 rounded-lg text-sm text-zinc-200 placeholder:text-zinc-600 focus:outline-none focus:border-indigo-500/50 transition-colors"
                       />
                     </div>
-                    <div className="space-y-1.5">
-                      <label className="text-xs text-zinc-500 font-medium">Seed (Optional)</label>
-                      <div className="flex gap-2 items-center">
-                        <input
-                          type="number"
-                          value={seed}
-                          onChange={(e) => setSeed(e.target.value)}
-                          placeholder="Random"
-                          className="w-full px-3 py-2 bg-zinc-900 border border-zinc-800 rounded-lg text-sm text-zinc-200 placeholder:text-zinc-600 focus:outline-none focus:border-indigo-500/50 transition-colors"
-                        />
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-6">
+                      <div className="space-y-1.5 flex-1">
+                        <label className="text-xs text-zinc-500 font-medium">Seed (Optional)</label>
+                        <div className="flex gap-2 items-center">
+                          <input
+                            type="number"
+                            value={seed}
+                            onChange={(e) => setSeed(e.target.value)}
+                            placeholder="Random"
+                            className="w-full px-3 py-2 bg-zinc-900 border border-zinc-800 rounded-lg text-sm text-zinc-200 placeholder:text-zinc-600 focus:outline-none focus:border-indigo-500/50 transition-colors"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setSeed(Math.floor(Math.random() * 1000000).toString())}
+                            className="p-2 bg-zinc-900 border border-zinc-800 rounded-lg text-zinc-400 hover:text-zinc-200 hover:border-zinc-700 transition-colors"
+                            title="Generate Random Seed"
+                          >
+                            <Dices className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </div>
+                      <div className="space-y-1.5 flex-shrink-0">
+                        <label className="text-xs text-zinc-500 font-medium">NSFW Mode</label>
                         <button
                           type="button"
-                          onClick={() => setSeed(Math.floor(Math.random() * 1000000).toString())}
-                          className="p-2 bg-zinc-900 border border-zinc-800 rounded-lg text-zinc-400 hover:text-zinc-200 hover:border-zinc-700 transition-colors"
-                          title="Generate Random Seed"
+                          onClick={() => setNsfwMode(!nsfwMode)}
+                          className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-offset-2 focus:ring-offset-zinc-900 ${
+                            nsfwMode ? 'bg-pink-600' : 'bg-zinc-700'
+                          }`}
                         >
-                          <Dices className="w-4 h-4" />
+                          <span
+                            className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                              nsfwMode ? 'translate-x-6' : 'translate-x-1'
+                            }`}
+                          />
                         </button>
                       </div>
-                    </div>
-                    <div className="space-y-1.5">
-                      <label className="text-xs text-zinc-500 font-medium">NSFW Mode</label>
-                      <button
-                        type="button"
-                        onClick={() => setNsfwMode(!nsfwMode)}
-                        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-offset-2 focus:ring-offset-zinc-900 ${
-                          nsfwMode ? 'bg-pink-600' : 'bg-zinc-700'
-                        }`}
-                      >
-                        <span
-                          className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                            nsfwMode ? 'translate-x-6' : 'translate-x-1'
-                          }`}
-                        />
-                      </button>
                     </div>
                   </div>
                 )}
