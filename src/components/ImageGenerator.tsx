@@ -238,6 +238,31 @@ export default function ImageGenerator() {
     localStorage.setItem('provider', provider);
   }, [provider]);
 
+  // when using Pollinations, keep width/height in sync with the selected aspect ratio
+  useEffect(() => {
+    if (provider === 'pollinations') {
+      let w = 1024, h = 1024;
+      switch (aspectRatio) {
+        case '16:9':
+          w = 1280; h = 720;
+          break;
+        case '9:16':
+          w = 720; h = 1280;
+          break;
+        case '4:3':
+          w = 1024; h = 768;
+          break;
+        case '3:4':
+          w = 768; h = 1024;
+          break;
+        default:
+          w = 1024; h = 1024;
+      }
+      setPollinationsWidth(w);
+      setPollinationsHeight(h);
+    }
+  }, [aspectRatio, provider]);
+
   const [selectedPalette, setSelectedPalette] = useState<string>('');
 
   useEffect(() => {
@@ -1522,7 +1547,7 @@ export default function ImageGenerator() {
                           step="64"
                           value={pollinationsWidth}
                           onChange={(e) => setPollinationsWidth(Number(e.target.value))}
-                          className="w-full px-3 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-sm text-zinc-200 focus:outline-none focus:border-indigo-500"
+                          className="w-full sm:w-32 px-3 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-sm text-zinc-200 focus:outline-none focus:border-indigo-500"
                         />
                       </div>
                       <div className="space-y-2">
@@ -1534,7 +1559,7 @@ export default function ImageGenerator() {
                           step="64"
                           value={pollinationsHeight}
                           onChange={(e) => setPollinationsHeight(Number(e.target.value))}
-                          className="w-full px-3 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-sm text-zinc-200 focus:outline-none focus:border-indigo-500"
+                          className="w-full sm:w-32 px-3 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-sm text-zinc-200 focus:outline-none focus:border-indigo-500"
                         />
                       </div>
                     </div>
