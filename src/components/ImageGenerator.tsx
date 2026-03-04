@@ -1208,8 +1208,8 @@ export default function ImageGenerator() {
     <div className="w-full max-w-5xl mx-auto p-4 sm:p-6 md:p-8 space-y-6 sm:space-y-8 md:space-y-10">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 sm:gap-6">
         <div className="space-y-1 flex items-center gap-3">
-          {/* professional logo - replace "/logo.png" with your actual asset */}
-          <img src="/logo.png" alt="Picky Studio logo" className="w-10 h-10" />
+          {/* professional logo - replace "/logo.svg" with your actual asset in the public folder */}
+          <img src="/logo.svg" alt="Picky Studio logo" className="w-10 h-10" />
           <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 text-transparent bg-clip-text animate-pulse">
             Picky Studio
           </h1>
