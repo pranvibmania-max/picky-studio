@@ -28,5 +28,17 @@ export const generateImagePollinations = async (
   const w = Math.min(width, maxSize);
   const h = Math.min(height, maxSize);
   const finalUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=${w}&height=${h}&seed=${seed}&model=${model}&nologo=true`;
+
+  // verify endpoint is reachable; if not, throw so the UI can fall back
+  try {
+    const head = await fetch(finalUrl, { method: 'HEAD' });
+    if (!head.ok) {
+      throw new Error(`Pollinations returned status ${head.status}`);
+    }
+  } catch (e) {
+    console.warn('Pollinations HEAD request failed', e);
+    throw e;
+  }
+
   return finalUrl;
 };
