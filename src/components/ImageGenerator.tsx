@@ -1512,7 +1512,7 @@ export default function ImageGenerator() {
                       <Ratio className="w-4 h-4 text-indigo-500" />
                       Image Dimensions
                     </label>
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div className="space-y-2">
                         <label className="text-xs text-zinc-400">Width</label>
                         <input
@@ -1538,8 +1538,8 @@ export default function ImageGenerator() {
                         />
                       </div>
                     </div>
-                    <div className="flex flex-wrap gap-2">
-                      {[
+                    <div className="flex flex-wrap justify-center gap-2">
+                      [{
                         { w: 1024, h: 1024, label: '1:1' },
                         { w: 1280, h: 720, label: '16:9' },
                         { w: 720, h: 1280, label: '9:16' },
